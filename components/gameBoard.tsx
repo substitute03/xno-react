@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { GameStateUpdate, State } from "../models/gameState";
+import { GameStateUpdate, State, Scores } from "../models/gameState";
 import Cell from "./cell";
 
 interface GameBoardProps {
@@ -13,11 +13,15 @@ export default function GameBoard({ gameStateUpdate: handleGameStateUpdate }: Ga
       [defaultGridValue, defaultGridValue, defaultGridValue],
       [defaultGridValue, defaultGridValue, defaultGridValue]];
 
+   const initialScores: Scores = {
+      player1Score: 0,
+      player2Score: 0
+   }
+
    const[gameBoard, setGameBoard] = useState(initialGrid);
    const[playerTurn, setPlayerTurn] = useState(0);
    const[gameState, setGameState] = useState(State.InProgress);
-   const [cells, setCells] = useState<{[key: string]: React.ReactElement}>({});
-
+   const[scores, setScores] = useState(initialScores);
 
    // useRef will store a reference to something. The component will then NOT re-render if this thing/object/variable changes.
    // This means I don't have to include it in the onGameStateChange useEffect hooks' dependency array, although this isn't really necessary or important.
@@ -25,26 +29,46 @@ export default function GameBoard({ gameStateUpdate: handleGameStateUpdate }: Ga
    const handleGameStateUpdateRef = useRef(handleGameStateUpdate);
 
    useEffect(function onGameStateChange() {
+      if (gameState === State.WinnerFound) {
+         let newScores = scores;
+
+         switch (playerTurn) {
+             case 0:
+                 newScores.player1Score++;
+                 setScores(newScores);
+                 break;
+             case 1:
+                 newScores.player2Score++;
+                 setScores(newScores);
+                 break;
+             default:
+                 break;
+         }
+     }
+
       const gameStateUpdate: GameStateUpdate = 
          gameState === State.WinnerFound
             ? {
                   description: `Player ${playerTurn === 0 ? "1" : "2"}`,
                   state: State.WinnerFound,
+                  scores: scores
                }
             : gameState === State.Draw
             ? {
                   description: `Draw`,
                   state: State.Draw,
+                  scores: scores
                }
             : {
                   description: `Player ${playerTurn === 0 ? 1 : 2}`,
                   state: State.InProgress,
+                  scores: scores
                };
     
       // Communicate the game state to parent.
       handleGameStateUpdateRef.current(gameStateUpdate);
 
-    }, [gameState, playerTurn]);
+    }, [gameState, playerTurn, scores]);
 
    function cellOnClick(r: number, c: number): void{
       if (gameBoard[r][c] !== defaultGridValue ||
@@ -59,35 +83,45 @@ export default function GameBoard({ gameStateUpdate: handleGameStateUpdate }: Ga
       checkForWinner();
 
       if (gameState === State.InProgress){
-         const nextPlayer = playerTurn === 0 ? 1: 0;
+         const nextPlayer : number = playerTurn === 0 ? 1: 0;
          setPlayerTurn(nextPlayer);
       }
    }
 
    function checkForWinner(): void {
+      checkForDraw();
+      checkRows();
+      checkColumns();
+      checkDiagonals();
+   }
+
+   function checkForDraw(): void {
       if (!gameBoard.flatMap(row => row).some(value => value === defaultGridValue)){
          setGameState(State.Draw);
       }
+   }
 
-      // Checking rows
+   function checkRows(): void {
       for (let i = 0; i < 3; i++) {
-        const rowSum = gameBoard[i][0] + gameBoard[i][1] + gameBoard[i][2];
+         const rowSum = gameBoard[i][0] + gameBoard[i][1] + gameBoard[i][2];
 
-        if (rowSum === 0 || rowSum === 3){
+         if (rowSum === 0 || rowSum === 3){
          setGameState(State.WinnerFound);
-        }     
+         }     
       }
-    
-      // Checking columns
-      for (let j = 0; j < 3; j++) {
-        const colSum = gameBoard[0][j] + gameBoard[1][j] + gameBoard[2][j];
+   }
+
+   function checkColumns(): void {
+      for (let i = 0; i < 3; i++) {
+         const colSum = gameBoard[0][i] + gameBoard[1][i] + gameBoard[2][i];
 
          if (colSum === 0 || colSum === 3){
             setGameState(State.WinnerFound);
          }  
       }
-    
-      // Checking diagonals
+   }
+
+   function checkDiagonals(): void{
       const diagonal1Sum = gameBoard[0][0] + gameBoard[1][1] + gameBoard[2][2];
       const diagonal2Sum = gameBoard[0][2] + gameBoard[1][1] + gameBoard[2][0];
 
@@ -95,14 +129,13 @@ export default function GameBoard({ gameStateUpdate: handleGameStateUpdate }: Ga
          diagonal2Sum === 0 || diagonal2Sum === 3){
             setGameState(State.WinnerFound);
       }
-    }
+   }
     
     function resetGameBoard(): void{
       setGameBoard(initialGrid);
       setPlayerTurn(0);
       setGameState(State.InProgress);
     }
-
 
    return (
       <>
