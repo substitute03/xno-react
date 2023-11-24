@@ -137,6 +137,10 @@ export default function GameBoard({ gameStateUpdate: handleGameStateUpdate }: Ga
       setGameState(State.InProgress);
     }
 
+    function resetScores(): void{
+      setScores(initialScores);
+    }
+
    return (
       <>
       <div className='rowCenter gridContainer'>
@@ -154,7 +158,10 @@ export default function GameBoard({ gameStateUpdate: handleGameStateUpdate }: Ga
       </div>
       <div className="row col-2 offset-5 mt-5">
          <button className="btn btn-danger text fs-6" onClick={resetGameBoard}>Reset Game</button>
-      </div>   
+      </div> 
+      <div className="row col-2 offset-5 mt-3">
+         <button className="btn btn-danger text fs-6" onClick={resetScores}>Reset Scores</button>
+      </div> 
       </>
    )
 }
