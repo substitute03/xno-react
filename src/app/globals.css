@@ -1,0 +1,33 @@
+/* Center content horizontally */
+.rowCenter {
+   display: flex;
+   justify-content: center;
+ }
+ 
+ /* Styles for the grid container */
+ .gridContainer {
+   margin-top: 20px; /* Adjust this margin as needed */
+ }
+ 
+ /* Your grid styles */
+ .grid {
+   display: grid;
+   grid-template-columns: repeat(3, 100px); /* Adjust the width of the grid cells */
+   grid-gap: 5px; /* Adjust the gap between cells */
+ }
+ 
+ /* Individual cell styles */
+ .cell {
+   flex: 1 0 33.333%;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   border: 1px solid #000;
+   /* Additional styling */
+   height: 100px;
+ }
+
+ .cell:hover{
+   border: 3px solid;
+   border-color: rgb(201, 21, 21);
+ }
