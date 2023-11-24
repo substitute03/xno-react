@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { GameStateUpdate, State } from "../models/gameState";
+import Cell from "./cell";
 
 interface GameBoardProps {
    gameStateUpdate: (state: GameStateUpdate) => void;
@@ -10,12 +11,12 @@ export default function GameBoard({ gameStateUpdate: handleGameStateUpdate }: Ga
    const initialGrid: number[][] = [
       [defaultGridValue, defaultGridValue, defaultGridValue],
       [defaultGridValue, defaultGridValue, defaultGridValue],
-      [defaultGridValue, defaultGridValue, defaultGridValue]
-   ];
+      [defaultGridValue, defaultGridValue, defaultGridValue]];
 
    const[gameBoard, setGameBoard] = useState(initialGrid);
    const[playerTurn, setPlayerTurn] = useState(0);
    const[gameState, setGameState] = useState(State.InProgress);
+   const [cells, setCells] = useState<{[key: string]: React.ReactElement}>({});
 
 
    // useRef will store a reference to something. The component will then NOT re-render if this thing/object/variable changes.
@@ -45,15 +46,15 @@ export default function GameBoard({ gameStateUpdate: handleGameStateUpdate }: Ga
 
     }, [gameState, playerTurn]);
 
-   function cellOnClick(r: number, c: number, moveType: number): void{
+   function cellOnClick(r: number, c: number): void{
       if (gameBoard[r][c] !== defaultGridValue ||
           gameState === State.WinnerFound ||
           gameState === State.Draw) {
             return;
          }
 
-      let newGameboard = [...gameBoard];
-      newGameboard[r][c] = moveType;
+      const newGameboard = [...gameBoard];
+      newGameboard[r][c] = playerTurn;
       setGameBoard(newGameboard);
       checkForWinner();
 
@@ -102,37 +103,20 @@ export default function GameBoard({ gameStateUpdate: handleGameStateUpdate }: Ga
       setGameState(State.InProgress);
     }
 
+
    return (
       <>
       <div className='rowCenter gridContainer'>
-         <div className="grid text-center">
-            <div className="cell" onClick={() => cellOnClick(0, 0, playerTurn)}>
-               {gameBoard[0][0] === 0 ? "O": gameBoard[0][0] === 1 ? "X" : ""}
-            </div>
-            <div className="cell" onClick={() => cellOnClick(0, 1, playerTurn)}>
-               {gameBoard[0][1] === 0 ? "O": gameBoard[0][1] === 1 ? "X" : ""}
-            </div>
-            <div className="cell" onClick={() => cellOnClick(0, 2, playerTurn)}>
-               {gameBoard[0][2] === 0 ? "O": gameBoard[0][2] === 1 ? "X" : ""}
-            </div>
-            <div className="cell" onClick={() => cellOnClick(1, 0, playerTurn)}>
-               {gameBoard[1][0] === 0 ? "O": gameBoard[1][0] === 1 ? "X" : ""}
-            </div>
-            <div className="cell" onClick={() => cellOnClick(1, 1, playerTurn)}>
-               {gameBoard[1][1] === 0 ? "O": gameBoard[1][1] === 1 ? "X" : ""}
-            </div>
-            <div className="cell" onClick={() => cellOnClick(1, 2, playerTurn)}>
-               {gameBoard[1][2] === 0 ? "O": gameBoard[1][2] === 1 ? "X" : ""}
-            </div>
-            <div className="cell" onClick={() => cellOnClick(2, 0, playerTurn)}>
-               {gameBoard[2][0] === 0 ? "O": gameBoard[2][0] === 1 ? "X" : ""}
-            </div>
-            <div className="cell" onClick={() => cellOnClick(2, 1, playerTurn)}>
-               {gameBoard[2][1] === 0 ? "O": gameBoard[2][1] === 1 ? "X" : ""}
-            </div>
-            <div className="cell" onClick={() => cellOnClick(2, 2, playerTurn)}>
-               {gameBoard[2][2] === 0 ? "O": gameBoard[2][2] === 1? "X": ""}
-            </div>
+         <div className="grid text-center"> 
+            <Cell row={0} col={0} value={gameBoard[0][0]} onClickEvent={cellOnClick}></Cell>
+            <Cell row={0} col={1} value={gameBoard[0][1]} onClickEvent={cellOnClick}></Cell>
+            <Cell row={0} col={2} value={gameBoard[0][2]} onClickEvent={cellOnClick}></Cell>
+            <Cell row={1} col={0} value={gameBoard[1][0]} onClickEvent={cellOnClick}></Cell>
+            <Cell row={1} col={1} value={gameBoard[1][1]} onClickEvent={cellOnClick}></Cell>
+            <Cell row={1} col={2} value={gameBoard[1][2]} onClickEvent={cellOnClick}></Cell>
+            <Cell row={2} col={0} value={gameBoard[2][0]} onClickEvent={cellOnClick}></Cell>
+            <Cell row={2} col={1} value={gameBoard[2][1]} onClickEvent={cellOnClick}></Cell>
+            <Cell row={2} col={2} value={gameBoard[2][2]} onClickEvent={cellOnClick}></Cell>
          </div>
       </div>
       <div className="row col-2 offset-5 mt-5">
@@ -141,3 +125,4 @@ export default function GameBoard({ gameStateUpdate: handleGameStateUpdate }: Ga
       </>
    )
 }
+
