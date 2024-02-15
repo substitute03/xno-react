@@ -31,7 +31,12 @@ export default function Game() {
   );
 
   function addPlayerNamesToMessage(player: number) {
-    if (message != "Draw" && !message.search("wins")) {
+    if (
+      scores.player1Score !== 0 &&
+      scores.player2Score !== 0 &&
+      scores.player1Score !== 3 &&
+      scores.player2Score !== 3
+    ) {
       if (player === 1) {
         setMessage(player1Name);
       } else if (player === 2) {
